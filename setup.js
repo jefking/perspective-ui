@@ -371,44 +371,6 @@ contextBridge.exposeInMainWorld('electron', {
   openFile: () => ipcRenderer.invoke('dialog:openFile')
 })`
   },
-  {
-    path: 'scripts/generate-test-data.js',
-    content: `const fs = require('fs');
-const path = require('path');
-const parquet = require('parquet-wasm');
-
-// Create sample data
-const data = [];
-for (let i = 0; i < 1000; i++) {
-  data.push({
-    id: i,
-    name: \`Person \${i}\`,
-    age: Math.floor(Math.random() * 100),
-    salary: Math.random() * 100000,
-    department: ['Engineering', 'Sales', 'Marketing', 'HR'][Math.floor(Math.random() * 4)],
-    active: Math.random() > 0.2
-  });
-}
-
-// Define schema
-const schema = {
-  id: { type: 'INT32' },
-  name: { type: 'UTF8' },
-  age: { type: 'INT32' },
-  salary: { type: 'DOUBLE' },
-  department: { type: 'UTF8' },
-  active: { type: 'BOOL' }
-};
-
-async function writeParquet() {
-  const writer = await parquet.ParquetWriter.openFile(schema, 'sample.parquet');
-  await writer.writeRows(data);
-  await writer.close();
-  console.log('Created sample.parquet with', data.length, 'rows');
-}
-
-writeParquet().catch(console.error);`
-  }
 ];
 
 async function setup() {
@@ -452,9 +414,13 @@ async function setup() {
   };
   pkg.devDependencies = {
     ...pkg.devDependencies,
-    "concurrently": "^8.2.2",
-    "wait-on": "^7.2.0",
-    "parquet-wasm": "^latest"
+    "concurrently": "^9.1.2",
+    "wait-on": "^8.0.2",
+    "parquet-wasm": "^0.6.1",
+    "@finos/perspective": "^3.3.4",
+    "@finos/perspective-viewer": "^3.3.4",
+    "@finos/perspective-viewer-datagrid": "^3.3.4",
+    "@finos/perspective-viewer-d3fc": "^3.3.4"
   };
 
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));

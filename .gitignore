@@ -5,6 +5,7 @@ node_modules
 
 # electron App
 pee-viewer
+electron
 
 # testing
 coverage

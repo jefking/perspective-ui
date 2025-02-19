@@ -11,6 +11,5 @@
     "generate-test-data": "cd pee-viewer && node ../scripts/generate-test-data.js"
   },
   "dependencies": {
-    "parquet-wasm": "0.4.0"
   }
 }

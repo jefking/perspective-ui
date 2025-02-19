@@ -3,8 +3,18 @@ import './App.css'
 import FileUpload from './components/FileUpload'
 import ParquetViewer from './components/ParquetViewer'
 
+// Import Perspective styles
+import "@finos/perspective-viewer/dist/css/material-dark.css";
+import "@finos/perspective-viewer-datagrid/dist/css/material.css";
+import "@finos/perspective-viewer-d3fc/dist/css/material.css";
+
 function App() {
   const [data, setData] = useState(null);
+
+  const handleDataLoaded = (newData) => {
+    console.log('App received data:', newData);
+    setData(newData);
+  };
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -14,9 +24,14 @@ function App() {
           <h1 className="text-2xl font-bold text-gray-900">
             Parquet Explorer
           </h1>
-          <FileUpload onDataLoaded={setData} />
+          <FileUpload onDataLoaded={handleDataLoaded} />
         </div>
       </header>
+
+      {/* Debug Info */}
+      <div className="bg-yellow-100 px-4 py-2">
+        <p>Data Status: {data ? `Loaded (${data.length} rows)` : 'No data'}</p>
+      </div>
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">

@@ -5,10 +5,17 @@
 perspective-viewer {
   height: 100%;
   width: 100%;
+  display: block;
 }
 
 .perspective-viewer-container {
   height: 100%;
   width: 100%;
   position: relative;
+}
+
+/* Override some Perspective default styles */
+perspective-viewer[theme="Material Light"] {
+  --plugin--background: white;
+  --modal--background: white;
 } 

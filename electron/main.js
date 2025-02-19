@@ -4,15 +4,25 @@ const isDev = require('electron-is-dev')
 const arrow = require('apache-arrow')
 const parquet = require('parquetjs')
 
+// Enable hot reloading in development
+if (isDev) {
+  try {
+    require('electron-reloader')(module, {
+      debug: true,
+      watchRenderer: false // Vite will handle renderer hot reloading
+    });
+  } catch (_) { console.log('Error hot reloading'); }
+}
+
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      webSecurity: true,
-      allowRunningInsecureContent: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
+      preload: path.join(__dirname, 'preload.js')
     },
   })
 
@@ -42,20 +52,28 @@ app.on('activate', () => {
 })
 
 ipcMain.handle('read-parquet', async (event, filePath) => {
+  console.log('Reading parquet file:', filePath);
   try {
-    const reader = await parquet.ParquetReader.openFile(filePath)
-    const cursor = reader.getCursor()
-    const records = []
+    const reader = await parquet.ParquetReader.openFile(filePath);
+    console.log('Parquet reader created');
+    const cursor = reader.getCursor();
+    const records = [];
     
-    let record = null
+    let record = null;
+    let count = 0;
     while (record = await cursor.next()) {
-      records.push(record)
+      records.push(record);
+      count++;
+      if (count % 1000 === 0) {
+        console.log(`Read ${count} records...`);
+      }
     }
     
-    await reader.close()
-    return records
+    await reader.close();
+    console.log(`Finished reading ${records.length} records`);
+    return records;
   } catch (error) {
-    console.error('Error reading Parquet file:', error)
-    throw error
+    console.error('Error reading Parquet file:', error);
+    throw error;
   }
-}) 
+}); 

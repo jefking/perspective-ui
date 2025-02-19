@@ -1,51 +1,11 @@
 {
-  "name": "pee-viewer",
+  "name": "pee-viewer-builder",
+  "version": "1.0.0",
   "private": true,
-  "version": "0.0.1",
-  "main": "electron/main.js",
   "scripts": {
-    "dev:web": "vite",
-    "dev:electron": "ELECTRON=true vite & electron .",
-    "build": "vite build",
-    "preview": "vite preview",
-    "electron:build": "vite build && electron-builder"
-  },
-  "build": {
-    "appId": "com.my-electron-app",
-    "mac": {
-      "category": "public.app-category.utilities"
-    },
-    "win": {
-      "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage"
-    },
-    "files": [
-      "dist/**/*",
-      "electron/**/*"
-    ]
-  },
-  "dependencies": {
-    "@finos/perspective": "^2.7.1",
-    "@finos/perspective-viewer": "^2.7.1",
-    "@finos/perspective-viewer-d3fc": "^2.7.1",
-    "@finos/perspective-viewer-datagrid": "^2.7.1",
-    "@headlessui/react": "^1.7.17",
-    "@heroicons/react": "^2.0.18",
-    "electron-is-dev": "^2.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
-    "@vitejs/plugin-react": "^1.3.2",
-    "autoprefixer": "^10.4.16",
-    "electron": "^27.0.0",
-    "electron-builder": "^24.6.4",
-    "postcss": "^8.4.31",
-    "tailwindcss": "^3.3.5",
-    "vite": "^0.10.3"
+    "create": "npx create-vite pee-viewer --template react && cd pee-viewer && npm install -D electron electron-builder @vitejs/plugin-react autoprefixer postcss tailwindcss electron-reloader concurrently wait-on && npm install electron-is-dev @finos/perspective @finos/perspective-viewer @finos/perspective-viewer-d3fc @finos/perspective-viewer-datagrid @headlessui/react @heroicons/react apache-arrow parquetjs",
+    "setup": "node setup.js",
+    "build": "npm run create && npm run setup",
+    "start": "cd pee-viewer && npm run start"
   }
 }

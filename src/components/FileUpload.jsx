@@ -3,14 +3,14 @@ import { useState } from 'react';
 export default function FileUpload({ onDataLoaded }) {
   const [loading, setLoading] = useState(false);
 
-  const handleClick = async () => {
+  const handleFileSelect = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
     try {
       setLoading(true);
-      const filePath = await window.electron.openFile();
-      if (filePath) {
-        const data = await window.electron.ipcRenderer.invoke('read-parquet', filePath);
-        onDataLoaded(data);
-      }
+      const data = await window.electron.ipcRenderer.invoke('read-parquet', file.path);
+      onDataLoaded(data);
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -19,12 +19,17 @@ export default function FileUpload({ onDataLoaded }) {
   };
 
   return (
-    <button
-      onClick={handleClick}
-      disabled={loading}
-      className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
-    >
-      {loading ? 'Loading...' : 'Open File'}
-    </button>
+    <>
+      <input 
+        type="file" 
+        id="fileElem" 
+        accept=".parquet" 
+        onChange={handleFileSelect}
+        disabled={loading}
+      />
+      <label className="button" htmlFor="fileElem">
+        {loading ? 'Loading...' : 'Select a file'}
+      </label>
+    </>
   );
 } 

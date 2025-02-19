@@ -3,20 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no" />
-      <link rel="preload" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/wasm/perspective-viewer.wasm" as="fetch" type="application/wasm" crossorigin="anonymous" />
-      <link rel="preload" href="https://cdn.jsdelivr.net/npm/@finos/perspective/dist/wasm/perspective-server.wasm" as="fetch" type="application/wasm" crossorigin="anonymous" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/wasm/perspective-viewer.wasm" as="fetch" type="application/wasm" crossorigin="anonymous" />
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@finos/perspective/dist/wasm/perspective-server.wasm" as="fetch" type="application/wasm" crossorigin="anonymous" />
     <title>Parquet Viewer</title>
     <script type="module" src="/src/main.jsx"></script>
     <link rel="stylesheet" href="/src/App.css" />
   </head>
   <body>
-    <div id="drop-area">
-        <form class="my-form">
-            <p>Upload a CSV/Arrow file by dragging from your desktop and dropping onto the dashed region.</p>
-            <p>(Data is processed in browser, and never sent to any server).</p>
-            <input type="file" id="fileElem" multiple accept=".feather,.arrow,.csv" />
-            <label class="button" for="fileElem">Select a file</label>
-        </form>
-    </div>
+    <div id="drop-area"></div>
   </body>
 </html> 

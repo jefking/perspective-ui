@@ -78,6 +78,13 @@ ipcMain.handle('read-parquet', async (event, filePath) => {
   try {
     // Read the parquet file using parquet-wasm
     const buffer = fs.readFileSync(filePath);
+    console.log('Buffer read successfully:', buffer); // Log buffer for debugging
+
+    // Check if parquet.ParquetReader is defined
+    if (!parquet.ParquetReader) {
+      throw new Error('ParquetReader is not defined. Please check the parquet-wasm import.');
+    }
+
     const reader = await parquet.ParquetReader.openBuffer(buffer);
     const result = await reader.readRows();
     const records = result.toArray();

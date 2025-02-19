@@ -1,19 +1,21 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const fs = require('fs')
-const { init, ParquetReader } = require('parquet-wasm')
+const parquetWasm = require('parquet-wasm')
 
 // Use isDev without electron-is-dev
 const isDev = process.env.npm_lifecycle_event === "electron";
 
-// Initialize parquet-wasm
-let parquetWasm = null;
-init().then(module => {
-  parquetWasm = module;
-  console.log('Parquet WASM initialized');
-}).catch(err => {
-  console.error('Failed to initialize Parquet WASM:', err);
-});
+// Initialize parquet-wasm at startup
+let parquetModule = null;
+async function initParquet() {
+  try {
+    parquetModule = await parquetWasm.init();
+    console.log('Parquet WASM initialized successfully');
+  } catch (err) {
+    console.error('Failed to initialize Parquet WASM:', err);
+  }
+}
 
 // Enable hot reloading in development
 if (isDev) {
@@ -48,7 +50,11 @@ function createWindow() {
   }
 }
 
-app.whenReady().then(createWindow)
+// Initialize parquet-wasm before creating window
+app.whenReady()
+  .then(initParquet)
+  .then(createWindow)
+  .catch(console.error);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
@@ -78,13 +84,13 @@ ipcMain.handle('dialog:openFile', async () => {
 ipcMain.handle('read-parquet', async (event, filePath) => {
   console.log('Reading parquet file:', filePath);
   try {
-    if (!parquetWasm) {
+    if (!parquetModule) {
       throw new Error('Parquet WASM not initialized');
     }
 
     // Read the parquet file using parquet-wasm
     const buffer = fs.readFileSync(filePath);
-    const reader = await parquetWasm.ParquetReader.openBuffer(buffer);
+    const reader = await parquetModule.ParquetReader.openBuffer(buffer);
     const result = await reader.readRows();
     const records = result.toArray();
     

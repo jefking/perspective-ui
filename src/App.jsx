@@ -11,26 +11,15 @@ import '@finos/perspective-viewer-d3fc'
 function App() {
   const [data, setData] = useState(null);
 
-  return (
-    <div className="h-screen flex flex-col">
-      {/* Simple header with file upload */}
-      <header className="bg-gray-800 text-white p-4 flex justify-between items-center">
-        <h1 className="text-xl font-semibold">Parquet Viewer</h1>
-        <FileUpload onDataLoaded={setData} />
-      </header>
-
-      {/* Main content area */}
-      <main className="flex-1 bg-white">
-        {data ? (
-          <ParquetViewer data={data} />
-        ) : (
-          <div className="h-full flex items-center justify-center text-gray-500">
-            Select a Parquet file to begin
-          </div>
-        )}
-      </main>
-    </div>
-  )
+  return data ? (
+    <ParquetViewer data={data} />
+  ) : (
+    <form className="my-form">
+      <p>Upload a Parquet file by dragging from your desktop and dropping onto the dashed region.</p>
+      <p>(Data is processed in browser, and never sent to any server).</p>
+      <FileUpload onDataLoaded={setData} />
+    </form>
+  );
 }
 
 export default App 

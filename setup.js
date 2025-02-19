@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const parquet = require('parquet-wasm');
 
 const files = [
   {
@@ -7,6 +8,7 @@ const files = [
     content: `const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const fs = require('fs')
+const parquet = require('parquet-wasm')
 
 // Use isDev without electron-is-dev
 const isDev = process.env.npm_lifecycle_event === "electron";
@@ -74,12 +76,12 @@ ipcMain.handle('dialog:openFile', async () => {
 ipcMain.handle('read-parquet', async (event, filePath) => {
   console.log('Reading parquet file:', filePath);
   try {
-    // Read file using parquet-wasm
+    // Read the parquet file using parquet-wasm
     const buffer = fs.readFileSync(filePath);
     const reader = await parquet.ParquetReader.openBuffer(buffer);
     const result = await reader.readRows();
     const records = result.toArray();
-
+    
     console.log(\`Loaded \${records.length} records\`);
     return records;
   } catch (error) {

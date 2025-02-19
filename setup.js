@@ -4,10 +4,9 @@ const path = require('path');
 const files = [
   {
     path: 'electron/main.cjs',
-    content: `const { app, BrowserWindow, ipcMain } = require('electron')
+    content: `const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
-const arrow = require('apache-arrow')
-const parquet = require('parquetjs')
+const fs = require('fs')
 
 // Use isDev without electron-is-dev
 const isDev = process.env.npm_lifecycle_event === "electron";
@@ -59,30 +58,33 @@ app.on('activate', () => {
   }
 })
 
+ipcMain.handle('dialog:openFile', async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [
+      { name: 'Parquet Files', extensions: ['parquet'] }
+    ]
+  });
+  if (!canceled) {
+    return filePaths[0];
+  }
+  return null;
+});
+
 ipcMain.handle('read-parquet', async (event, filePath) => {
   console.log('Reading parquet file:', filePath);
   try {
-    const reader = await parquet.ParquetReader.openFile(filePath);
-    console.log('Parquet reader created');
-    const cursor = reader.getCursor();
-    const records = [];
-    
-    let record = null;
-    let count = 0;
-    while (record = await cursor.next()) {
-      records.push(record);
-      count++;
-      if (count % 1000 === 0) {
-        console.log(\`Read \${count} records...\`);
-      }
-    }
-    
-    await reader.close();
-    console.log(\`Finished reading \${records.length} records\`);
+    // Read file using parquet-wasm
+    const buffer = fs.readFileSync(filePath);
+    const reader = await parquet.ParquetReader.openBuffer(buffer);
+    const result = await reader.readRows();
+    const records = result.toArray();
+
+    console.log(\`Loaded \${records.length} records\`);
     return records;
   } catch (error) {
     console.error('Error reading Parquet file:', error);
-    throw error;
+    throw new Error(\`Failed to read Parquet file: \${error.message}\`);
   }
 })`
   },
@@ -167,15 +169,18 @@ export default function FileUpload({ onDataLoaded }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleFileSelect = async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
+  const handleClick = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Use window.electron from the contextBridge
-      const data = await window.electron.ipcRenderer.invoke('read-parquet', file.path);
+      const filePath = await window.electron.openFile();
+      if (!filePath) {
+        setLoading(false);
+        return; // User cancelled
+      }
+
+      console.log('Selected file:', filePath);
+      const data = await window.electron.ipcRenderer.invoke('read-parquet', filePath);
       console.log('Loaded parquet data:', data);
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error('No data found in parquet file');
@@ -201,16 +206,13 @@ export default function FileUpload({ onDataLoaded }) {
           {error}
         </div>
       )}
-      <label className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 cursor-pointer">
+      <button
+        onClick={handleClick}
+        disabled={loading}
+        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
         {loading ? 'Loading...' : 'Open Parquet File'}
-        <input
-          type="file"
-          accept=".parquet"
-          onChange={handleFileSelect}
-          className="hidden"
-          disabled={loading}
-        />
-      </label>
+      </button>
     </div>
   );
 }`
@@ -356,8 +358,47 @@ export default defineConfig({
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
     invoke: (...args) => ipcRenderer.invoke(...args)
-  }
+  },
+  openFile: () => ipcRenderer.invoke('dialog:openFile')
 })`
+  },
+  {
+    path: 'scripts/generate-test-data.js',
+    content: `const fs = require('fs');
+const path = require('path');
+const parquet = require('parquet-wasm');
+
+// Create sample data
+const data = [];
+for (let i = 0; i < 1000; i++) {
+  data.push({
+    id: i,
+    name: \`Person \${i}\`,
+    age: Math.floor(Math.random() * 100),
+    salary: Math.random() * 100000,
+    department: ['Engineering', 'Sales', 'Marketing', 'HR'][Math.floor(Math.random() * 4)],
+    active: Math.random() > 0.2
+  });
+}
+
+// Define schema
+const schema = {
+  id: { type: 'INT32' },
+  name: { type: 'UTF8' },
+  age: { type: 'INT32' },
+  salary: { type: 'DOUBLE' },
+  department: { type: 'UTF8' },
+  active: { type: 'BOOL' }
+};
+
+async function writeParquet() {
+  const writer = await parquet.ParquetWriter.openFile(schema, 'sample.parquet');
+  await writer.writeRows(data);
+  await writer.close();
+  console.log('Created sample.parquet with', data.length, 'rows');
+}
+
+writeParquet().catch(console.error);`
   }
 ];
 
@@ -368,6 +409,7 @@ async function setup() {
   const dirs = [
     path.join(appDir, 'electron'),
     path.join(appDir, 'src', 'components'),
+    path.join(appDir, 'scripts')
   ];
   
   dirs.forEach(dir => {
@@ -402,7 +444,8 @@ async function setup() {
   pkg.devDependencies = {
     ...pkg.devDependencies,
     "concurrently": "^8.2.2",
-    "wait-on": "^7.2.0"
+    "wait-on": "^7.2.0",
+    "parquet-wasm": "^latest"
   };
 
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));

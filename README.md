@@ -1,65 +1,32 @@
-# Electron React App with Tailwind CSS
+# Parquet Explorer
 
-A cross-platform desktop application built with Electron, React, and Tailwind CSS.
+A cross-platform desktop application for viewing Parquet files, built with Electron, React, and Perspective.
 
 ## Features
 
 - 🚀 Electron for desktop applications
 - ⚛️ React for UI
+- 📊 Perspective for data visualization
 - 🎨 Tailwind CSS for styling
-- 🌐 Web and desktop compatible
-- 📁 File system access (for .parquet files)
-- ⚙️ WASM support
-
-## Prerequisites
-
-- Node.js (v14 or higher)
-- npm (v6 or higher)
-
-## Getting Started
-
-1. Create a new project:
-```bash
-npx create-vite my-electron-app --template react
-cd my-electron-app
-```
-
-2. Install dependencies:
-```bash
-npm install -D electron electron-builder @vitejs/plugin-react autoprefixer postcss tailwindcss
-npm install electron-is-dev
-```
-
-3. Install UI dependencies:
-```bash
-npm install @headlessui/react @heroicons/react
-```
-
-4. Development:
-- For Electron development:
-```bash
-npm run dev:electron
-```
-- For web-only development:
-```bash
-npm run dev:web
-```
-
-5. Build:
-```bash
-npm run build
-```
+- 📁 Parquet file support
+- ⚙️ WASM-powered parsing
 
 ## Project Structure
 
 ```
-my-electron-app/
+pee-viewer/
 ├── electron/
-│   └── main.js
+│   ├── main.cjs
+│   └── preload.cjs
 ├── src/
 │   ├── components/
+│   │   ├── FileUpload.jsx
+│   │   └── ParquetViewer.jsx
 │   ├── App.jsx
+│   ├── App.css
 │   └── main.jsx
+├── scripts/
+│   └── generate-test-data.js
 ├── index.html
 ├── package.json
 ├── postcss.config.js
@@ -67,16 +34,28 @@ my-electron-app/
 └── vite.config.js
 ```
 
-## Scripts
+## Development
 
-- `dev:electron`: Run the app in electron development mode
-- `dev:web`: Run the app in web development mode
-- `build`: Build the app for production
-- `preview`: Preview the production build
+1. Install dependencies and set up the project:
+```bash
+npm run build
+```
 
-## Configuration
+2. Start the development server:
+```bash
+npm start
+```
 
-Check the following configuration files:
-- `vite.config.js` - Vite configuration
-- `tailwind.config.js` - Tailwind CSS configuration
-- `electron/main.js` - Electron main process
+3. Generate test data:
+```bash
+npm run generate-test-data
+```
+
+## Usage
+
+1. Click "Open Parquet File" to select a Parquet file
+2. Use Perspective's interface to:
+   - View data in a grid
+   - Create visualizations
+   - Filter and sort data
+   - Export data

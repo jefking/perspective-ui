@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
+@tailwind utilities;
+
+perspective-viewer {
+  height: 100%;
+  width: 100%;
+}
+
+.perspective-viewer-container {
+  height: 100%;
+  width: 100%;
+  position: relative;
+} 

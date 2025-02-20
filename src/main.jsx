@@ -7,4 +7,4 @@ ReactDOM.createRoot(document.getElementById('drop-area')).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-) 
+)

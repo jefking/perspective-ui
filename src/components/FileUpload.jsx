@@ -20,10 +20,10 @@ export default function FileUpload({ onDataLoaded }) {
 
   return (
     <>
-      <input 
-        type="file" 
-        id="fileElem" 
-        accept=".parquet" 
+      <input
+        type="file"
+        id="fileElem"
+        accept=".parquet"
         onChange={handleFileSelect}
         disabled={loading}
       />
@@ -32,4 +32,4 @@ export default function FileUpload({ onDataLoaded }) {
       </label>
     </>
   );
-} 
+}

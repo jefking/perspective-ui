@@ -5,9 +5,8 @@
   "scripts": {
     "clean": "rm -rf pee-viewer",
     "create": "npx create-vite pee-viewer --template react && cd pee-viewer && npm install -D electron electron-builder @vitejs/plugin-react autoprefixer postcss tailwindcss electron-reloader concurrently wait-on && npm install @finos/perspective @finos/perspective-viewer @finos/perspective-viewer-d3fc @finos/perspective-viewer-datagrid @headlessui/react @heroicons/react apache-arrow parquet-wasm@0.4.0",
-    "build": "npm run clean && npm run create && npm run setup",
+    "build": "npm run clean && npm run create",
     "start": "cd pee-viewer && npm run start"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

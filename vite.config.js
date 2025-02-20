@@ -4,7 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: process.env.ELECTRON=="true" ? './' : ".",
+  base: process.env.ELECTRON == "true" ? './' : ".",
   build: {
     outDir: 'dist',
   },

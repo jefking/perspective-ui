@@ -25,8 +25,6 @@ pee-viewer/
 │   ├── App.jsx
 │   ├── App.css
 │   └── main.jsx
-├── scripts/
-│   └── generate-test-data.js
 ├── index.html
 ├── package.json
 ├── postcss.config.js
@@ -44,11 +42,6 @@ npm run build
 2. Start the development server:
 ```bash
 npm start
-```
-
-3. Generate test data:
-```bash
-npm run generate-test-data
 ```
 
 ## Usage

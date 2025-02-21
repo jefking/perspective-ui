@@ -10,6 +10,7 @@ export default function FileUpload({ onDataLoaded }) {
     try {
       setLoading(true);
       const data = await window.electron.ipcRenderer.invoke('read-parquet', file.path);
+      console.log('Loaded data:', data);
       onDataLoaded(data);
     } catch (error) {
       console.error('Error:', error);

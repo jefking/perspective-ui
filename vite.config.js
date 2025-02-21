@@ -8,6 +8,9 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
+  server: {
+    open: false  // Prevent browser from opening automatically
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

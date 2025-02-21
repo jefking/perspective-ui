@@ -10,27 +10,32 @@ export default function FileUpload({ onDataLoaded }) {
     try {
       setLoading(true);
       const data = await window.electron.ipcRenderer.invoke('read-parquet', file.path);
-      console.log('Loaded data:', data);
+      console.log('Loaded Parquet data:', data);
       onDataLoaded(data);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error loading Parquet file:', error);
+      alert('Error loading Parquet file');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <>
+    <div>
       <input
         type="file"
         id="fileElem"
         accept=".parquet"
+        className="hidden"
         onChange={handleFileSelect}
         disabled={loading}
       />
-      <label className="button" htmlFor="fileElem">
-        {loading ? 'Loading...' : 'Select a file'}
+      <label 
+        htmlFor="fileElem"
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 cursor-pointer disabled:opacity-50"
+      >
+        {loading ? 'Loading...' : 'Open File'}
       </label>
-    </>
+    </div>
   );
 }

@@ -2,19 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="./dist/output.css" rel="stylesheet">
-    <title>Perspective Viewer</title>
+    <title>Parquet Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/@finos/perspective/dist/cdn/perspective.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/cdn/perspective-viewer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-datagrid/dist/cdn/perspective-viewer-datagrid.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc/dist/cdn/perspective-viewer-d3fc.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/css/themes.css">
+
   </head>
-  <body class="bg-white dark:bg-gray-800">
-    <div class="container">
-      <div class="file-input-section">
-        <input type="file" id="fileInput" accept=".parquet" onchange="loadParquetFile()" />
-      </div>
-      <div id="output"></div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/apache-arrow/Arrow.js"></script>
-    <script src="./renderer.js"></script>
+  <body>
+    <input type="file" id="fileInput" accept=".parquet" onchange="loadParquetFile()" />
+    <perspective-viewer id="perspective-viewer"></perspective-viewer>
+    <div id="output"></div>
+    <script src="src/renderer.js" defer></script>
   </body>
 </html>

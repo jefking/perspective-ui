@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+body {
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+#fileInput {
+    margin-bottom: 20px;
+}
+
+perspective-viewer {
+    flex: 1;
+    min-height: 500px;
+    margin-bottom: 20px;
+}
+
+#output {
+    min-height: 50px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.container {
+    @apply p-5;
+}
+
+.file-input-section {
+    @apply mb-5;
+}
+
+#loadButton {
+    @apply ml-2.5 p-1.5;
+}

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Parquet Viewer</title>
+    <link href="./dist/output.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@finos/perspective/dist/cdn/perspective.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/cdn/perspective-viewer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-datagrid/dist/cdn/perspective-viewer-datagrid.js"></script>
@@ -11,10 +12,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/css/themes.css">
 
   </head>
-  <body>
+  <body class="dark:bg-gray-900 dark:text-white">
     <input type="file" id="fileInput" accept=".parquet" onchange="loadParquetFile()" />
     <perspective-viewer id="perspective-viewer"></perspective-viewer>
-    <div id="output"></div>
+    <div id="output">Welcome to the Parquet Viewer! Please load a file to get started.</div>
     <script src="src/renderer.js" defer></script>
   </body>
 </html>

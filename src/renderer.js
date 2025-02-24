@@ -1,6 +1,14 @@
-// Wait for the custom elements to be defined
 window.addEventListener('WebComponentsReady', () => {
-    console.log('Web Components are ready');
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const output = document.getElementById('output');
+    await Promise.all([
+        perspective.viewer.registerPlugin("perspective-viewer-datagrid"),
+        perspective.viewer.registerPlugin("perspective-viewer-d3fc")
+    ]);
+    
+    output.textContent = 'Perspective plugins registered';
 });
 
 async function loadParquetFile() {
@@ -38,13 +46,3 @@ async function loadParquetFile() {
         output.textContent = 'Error reading file: ' + error.message;
     }
 }
-
-// Initialize perspective when the page loads
-document.addEventListener('DOMContentLoaded', async () => {
-    // Register the plugins with the viewer
-    await Promise.all([
-        perspective.viewer.registerPlugin("perspective-viewer-datagrid"),
-        perspective.viewer.registerPlugin("perspective-viewer-d3fc")
-    ]);
-    console.log('Perspective plugins registered');
-});

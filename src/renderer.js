@@ -4,19 +4,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const output = document.getElementById('output');
 
     loadButton.addEventListener('click', async () => {
-        const file = fileInput.files[0];
-        if (!file) {
-            alert('Please select a Parquet file first');
-            return;
-        }
-
-        try {
-            const buffer = await file.arrayBuffer();
-            
-            output.textContent = 'File loaded successfully!';
-        } catch (error) {
-            console.error('Error reading Parquet file:', error);
-            output.textContent = 'Error reading file: ' + error.message;
-        }
+        await loadParquetFile();
     });
 });
+
+async function loadParquetFile() {
+    const file = fileInput.files[0];
+    if (!file) {
+        alert('Please select a Parquet file first');
+        return;
+    }
+
+    try {
+        const buffer = await file.arrayBuffer();
+        
+        output.textContent = 'File loaded successfully!';
+    } catch (error) {
+        console.error('Error reading Parquet file:', error);
+        output.textContent = 'Error reading file: ' + error.message;
+    }
+}

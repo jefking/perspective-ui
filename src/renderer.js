@@ -5,35 +5,6 @@ import "https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc/dist/cdn/per
 
 console.log('Renderer script loaded');
 
-// Wait for perspective to be available
-function waitForPerspective() {
-    return new Promise((resolve) => {
-        // First check if perspective is already available
-        if (window.perspective) {
-            console.log('Perspective found immediately');
-            resolve(window.perspective);
-            return;
-        }
-
-        // If not, wait for the perspective-ready event
-        window.addEventListener('perspective-ready', () => {
-            console.log('Perspective ready event fired');
-            resolve(window.perspective);
-        });
-
-        // Set a timeout as fallback
-        setTimeout(() => {
-            if (window.perspective) {
-                console.log('Perspective found after timeout');
-                resolve(window.perspective);
-            } else {
-                console.error('Perspective not found after timeout');
-                resolve(null);
-            }
-        }, 5000);
-    });
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOMContentLoaded event fired');
     const output = document.getElementById('output');

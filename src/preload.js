@@ -6,6 +6,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     }
 })
 
+// Expose console.log to renderer
+contextBridge.exposeInMainWorld('console', {
+    log: (...args) => console.log(...args),
+    error: (...args) => console.error(...args)
+})
+
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)

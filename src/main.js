@@ -8,7 +8,7 @@ function createWindow () {
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js')
+            preload: './preload.js'
         }
     })
 

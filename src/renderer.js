@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         perspective.viewer.registerPlugin("perspective-viewer-datagrid"),
         perspective.viewer.registerPlugin("perspective-viewer-d3fc")
     ]);
-    
+
     output.textContent = 'Perspective plugins registered';
 });
 
@@ -17,10 +17,6 @@ async function loadParquetFile() {
     const viewer = document.getElementById('perspective-viewer');
 
     const file = fileInput.files[0];
-    if (!file) {
-        alert('Please select a Parquet file first');
-        return;
-    }
 
     try {
         const buffer = await file.arrayBuffer();

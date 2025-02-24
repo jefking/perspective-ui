@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:;">
     <title>Parquet Viewer</title>
     <link href="./dist/output.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@finos/perspective/dist/cdn/perspective.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/cdn/perspective-viewer.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-datagrid/dist/cdn/perspective-viewer-datagrid.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc/dist/cdn/perspective-viewer-d3fc.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective/dist/cdn/perspective.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/cdn/perspective-viewer.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-datagrid/dist/cdn/perspective-viewer-datagrid.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc/dist/cdn/perspective-viewer-d3fc.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/css/themes.css">
-
   </head>
   <body class="dark:bg-gray-900 dark:text-white">
-    <input type="file" id="fileInput" accept=".parquet" onchange="loadParquetFile()" />
+    <input type="file" id="fileInput" accept=".parquet" />
     <perspective-viewer id="perspective-viewer"></perspective-viewer>
     <div id="output">Welcome to the Parquet Viewer! Please load a file to get started.</div>
-    <script src="src/renderer.js" defer></script>
+    <script src="./renderer.js" type="module" defer></script>
   </body>
 </html>

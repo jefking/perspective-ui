@@ -1,26 +1,27 @@
 const { app, BrowserWindow } = require('electron')
-const path = require('node:path')
+const path = require('path')
 
 function createWindow () {
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
-  })
+    const win = new BrowserWindow({
+        width: 1200,
+        height: 800,
+        webPreferences: {
+            nodeIntegration: true,
+            contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js')
+        }
+    })
 
-  mainWindow.loadFile('index.html')
+    win.loadFile('./index.html')
+    win.webContents.openDevTools() // This will help us debug
 }
 
 app.whenReady().then(() => {
-  createWindow()
-
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
+    createWindow()
 })
 
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit()
+    }
 })

@@ -1,3 +1,11 @@
+const { contextBridge } = require('electron')
+
+contextBridge.exposeInMainWorld('electronAPI', {
+    log: (message) => {
+        console.log(message)
+    }
+})
+
 window.addEventListener('DOMContentLoaded', () => {
   const replaceText = (selector, text) => {
     const element = document.getElementById(selector)

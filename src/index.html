@@ -2,14 +2,19 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
     <link href="./styles.css" rel="stylesheet">
     <title>Perspective Viewer</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    We are using Node.js <span id="node-version"></span>,
-    Chromium <span id="chrome-version"></span>,
-    and Electron <span id="electron-version"></span>.
+    <div class="container">
+      <div class="file-input-section">
+        <input type="file" id="fileInput" accept=".parquet" />
+        <button id="loadButton">Load Parquet File</button>
+      </div>
+      <div id="output"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/apache-arrow/Arrow.js"></script>
+    <script src="./renderer.js"></script>
   </body>
 </html>

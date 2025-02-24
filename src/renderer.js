@@ -11,12 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // Read the file as an ArrayBuffer
             const buffer = await file.arrayBuffer();
-            
-            // Use Arrow.js to read the Parquet file
-            // Note: This is a placeholder - you'll need to implement the actual Parquet reading logic
-            // using the appropriate Arrow.js methods
             
             output.textContent = 'File loaded successfully!';
         } catch (error) {
@@ -24,4 +19,4 @@ document.addEventListener('DOMContentLoaded', () => {
             output.textContent = 'Error reading file: ' + error.message;
         }
     });
-}); 
+});

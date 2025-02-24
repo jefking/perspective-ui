@@ -1,5 +1,5 @@
 {
-  "name": "Perspective Viewer",
+  "name": "perspective-viewer",
   "version": "1.0.0",
   "description": "A basic Perspective Viewer",
   "main": "main.js",

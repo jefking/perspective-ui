@@ -58,11 +58,8 @@ function initializeApp() {
     }
 }
 
-// Check if DOM is already loaded
 if (document.readyState === 'loading') {
-    // If not loaded yet, add event listener
     document.addEventListener('DOMContentLoaded', initializeApp);
 } else {
-    // If already loaded, run initialization immediately
     initializeApp();
 }

@@ -45,38 +45,51 @@
       // Get elements directly instead of waiting for DOM content loaded
       const output = document.getElementById('output');
       const fileInfo = document.getElementById('file-info');
+      const viewer = document.getElementById('perspective-viewer');
+      const fileInput = document.getElementById('fileInput');
       
       console.log('Output element found:', output);
       
       // Initialize immediately, don't wait for DOMContentLoaded
       async function initializeApp() {
-        if (!output) {
-          console.error('Output element not found');
+        if (!output || !viewer || !fileInput) {
+          console.error('Required elements not found');
           return;
         }
         
         try {
           output.textContent = 'Initializing...';
           
-          // Create the worker
-          const worker = perspective.worker();
-          console.log('Perspective worker created');
-          output.textContent = 'Perspective initialized - ready to load files';
+          // Create the worker with explicit config for better performance
+          const worker = perspective.worker({
+            // Try to use shared memory if available
+            shared_worker: false,
+            // Explicitly enable WebAssembly
+            wasm: true
+          });
           
-          const viewer = document.getElementById('perspective-viewer');
-          const fileInput = document.getElementById('fileInput');
+          console.log('Perspective worker created with explicit WebAssembly config');
           
-          if (!viewer || !fileInput) {
-            console.error('Required elements not found');
-            return;
-          }
+          // Initialize perspective with an empty table first
+          console.log('Creating empty table for initial load');
+          const emptyTable = await worker.table({
+            'Column 1': ['No data loaded'],
+            'Column 2': [0]
+          });
           
-          // Configure initial viewer settings
+          // First load an empty table
+          console.log('Loading empty table into viewer');
+          await viewer.load(emptyTable);
+          
+          // Then restore settings
+          console.log('Restoring viewer settings');
           await viewer.restore({
             plugin: 'Datagrid',
             settings: true,
             theme: document.documentElement.classList.contains('dark') ? 'Pro Dark' : 'Pro Light'
           });
+          
+          output.textContent = 'Perspective initialized - ready to load files';
           
           // Handle file loading
           fileInput.addEventListener('change', async () => {
@@ -95,25 +108,35 @@
               const extension = file.name.split('.').pop().toLowerCase();
               let table;
               
+              console.log(`Processing ${extension} file...`);
+              
               switch (extension) {
                 case 'csv':
                   const csvText = await file.text();
+                  console.log('CSV text loaded, creating table...');
                   table = await worker.table(csvText);
                   break;
                 case 'json':
                   const jsonText = await file.text();
-                  table = await worker.table(JSON.parse(jsonText));
+                  console.log('JSON text loaded, creating table...');
+                  const jsonData = JSON.parse(jsonText);
+                  table = await worker.table(jsonData);
                   break;
                 case 'arrow':
-                case 'parquet':
-                default:
-                  const buffer = await file.arrayBuffer();
-                  table = await worker.table(buffer);
+                  const arrowBuffer = await file.arrayBuffer();
+                  console.log('Arrow buffer loaded, creating table...');
+                  table = await worker.table(arrowBuffer);
                   break;
+                case 'parquet':
+                  const parquetBuffer = await file.arrayBuffer();
+                  console.log('Parquet buffer loaded, creating table...');
+                  table = await worker.table(parquetBuffer);
+                  break;
+                default:
+                  throw new Error(`Unsupported file format: ${extension}`);
               }
               
-              // Add debug statements
-              console.log('File loaded, creating table...');
+              console.log('Table created, loading into viewer...');
               
               // Load table into viewer
               await viewer.load(table);
@@ -121,6 +144,7 @@
               const rowCount = await table.num_rows();
               const columnCount = await table.num_columns();
               output.textContent = `Loaded successfully: ${rowCount} rows × ${columnCount} columns`;
+              console.log(`Loaded successfully: ${rowCount} rows × ${columnCount} columns`);
               
             } catch (error) {
               console.error('Error loading file:', error);
@@ -131,13 +155,16 @@
           
           output.textContent = 'Ready to load files. Supported formats: Parquet, CSV, Arrow, JSON';
           
-          // Test the output functionality every few seconds
-          let testCount = 0;
-          setInterval(() => {
-            testCount++;
-            output.textContent = `Output test ${testCount}: ${new Date().toLocaleTimeString()}`;
-            console.log(`Updated output element (${testCount})`);
-          }, 5000);
+          // Debug: Add a simple counter to verify UI updates work
+          let counter = 0;
+          const counterInterval = setInterval(() => {
+            counter++;
+            console.log(`Debug counter: ${counter}`);
+            // Only update every 10 seconds to avoid interfering with normal operation
+            if (counter % 10 === 0) {
+              output.textContent = `Still ready... (${counter} seconds elapsed)`;
+            }
+          }, 1000);
           
         } catch (error) {
           console.error('Error initializing perspective:', error);

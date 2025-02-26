@@ -9,9 +9,110 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/css/themes.css">
   </head>
   <body class="dark:bg-gray-900 dark:text-white">
-    <input type="file" id="fileInput" accept=".parquet" />
+    <div class="file-controls">
+      <input type="file" id="fileInput" accept=".parquet,.csv,.arrow,.json" />
+      <span id="file-info"></span>
+    </div>
     <perspective-viewer id="perspective-viewer"></perspective-viewer>
     <div id="output">Welcome to the Parquet Viewer! Please load a file to get started.</div>
-    <script type="module" src="./renderer.js"></script>
+
+    <!-- Import scripts directly in the HTML -->
+    <script type="module">
+      // Import Perspective libraries
+      import perspective from "https://cdn.jsdelivr.net/npm/@finos/perspective/dist/cdn/perspective.js";
+      import "https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/cdn/perspective-viewer.js";
+      import "https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-datagrid/dist/cdn/perspective-viewer-datagrid.js";
+      import "https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc/dist/cdn/perspective-viewer-d3fc.js";
+
+      console.log('Renderer script loaded');
+      const output = document.getElementById('output');
+      const fileInfo = document.getElementById('file-info');
+
+      // Initialize perspective worker once DOM is loaded
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // Create the worker
+          const worker = perspective.worker();
+          console.log('Perspective worker created');
+          output.textContent = 'Perspective initialized - ready to load files';
+          
+          const viewer = document.getElementById('perspective-viewer');
+          const fileInput = document.getElementById('fileInput');
+          
+          if (!viewer || !fileInput) {
+            console.error('Required elements not found');
+            return;
+          }
+          
+          // Configure initial viewer settings
+          await viewer.restore({
+            plugin: 'Datagrid',
+            settings: true,
+            theme: document.documentElement.classList.contains('dark') ? 'Pro Dark' : 'Pro Light'
+          });
+          
+          // Handle file loading
+          fileInput.addEventListener('change', async () => {
+            const file = fileInput.files[0];
+            
+            if (!file) {
+              output.textContent = 'No file selected';
+              return;
+            }
+            
+            output.textContent = `Loading ${file.name}...`;
+            fileInfo.textContent = `${file.name} (${formatFileSize(file.size)})`;
+            
+            try {
+              // Determine how to load the file based on extension
+              const extension = file.name.split('.').pop().toLowerCase();
+              let table;
+              
+              switch (extension) {
+                case 'csv':
+                  const csvText = await file.text();
+                  table = await worker.table(csvText);
+                  break;
+                case 'json':
+                  const jsonText = await file.text();
+                  table = await worker.table(JSON.parse(jsonText));
+                  break;
+                case 'arrow':
+                case 'parquet':
+                default:
+                  const buffer = await file.arrayBuffer();
+                  table = await worker.table(buffer);
+                  break;
+              }
+              
+              // Load table into viewer
+              await viewer.load(table);
+              
+              const rowCount = await table.num_rows();
+              const columnCount = await table.num_columns();
+              output.textContent = `Loaded successfully: ${rowCount} rows × ${columnCount} columns`;
+              
+            } catch (error) {
+              console.error('Error loading file:', error);
+              output.textContent = `Error: ${error.message}`;
+              fileInfo.textContent = '';
+            }
+          });
+          
+          output.textContent = 'Ready to load files. Supported formats: Parquet, CSV, Arrow, JSON';
+        } catch (error) {
+          console.error('Error initializing perspective:', error);
+          output.textContent = `Error initializing perspective: ${error.message}`;
+        }
+      });
+
+      // Add a utility function to format file sizes
+      function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' bytes';
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+        else return (bytes / 1073741824).toFixed(1) + ' GB';
+      }
+    </script>
   </body>
 </html>

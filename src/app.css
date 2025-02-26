@@ -2,44 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-@custom-variant dark (&:where(.dark, .dark *));
+@layer components {
+  body {
+    @apply m-0 p-5 flex flex-col h-screen box-border overflow-hidden;
+  }
 
-body {
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-#fileInput {
-    margin-bottom: 10px;
-}
-
-perspective-viewer {
-    flex: 1;
-    min-height: 0;
-    margin-bottom: 10px;
-}
-
-#output {
-    height: 50px;
-    padding: 10px;
-    border-radius: 4px;
-    font-family: monospace;
-    @apply bg-gray-100 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700;
-}
-
-.container {
-    @apply p-5;
-}
-
-.file-input-section {
+  .file-controls {
     @apply mb-5;
-}
+  }
 
-#loadButton {
+  #fileInput {
+    @apply mb-2.5;
+  }
+
+  perspective-viewer {
+    @apply flex-1 min-h-[500px] mb-2.5;
+  }
+
+  #output {
+    @apply p-2.5 rounded font-mono text-gray-600 dark:text-gray-300 
+           bg-gray-100 dark:bg-gray-800 border border-gray-300 
+           dark:border-gray-700 border-t mt-2.5 h-auto;
+  }
+
+  .dark #output {
+    @apply text-gray-400 border-gray-700;
+  }
+
+  .container {
+    @apply p-5;
+  }
+
+  .file-input-section {
+    @apply mb-5;
+  }
+
+  #loadButton {
     @apply ml-2.5 p-1.5;
+  }
 }

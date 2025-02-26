@@ -7,6 +7,22 @@
     <title>Parquet Viewer</title>
     <link href="./dist/output.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/css/themes.css">
+    <style>
+      #output {
+        background-color: rgba(30, 30, 30, 0.8);
+        color: white;
+        padding: 10px;
+        margin-top: 20px;
+        border-radius: 5px;
+        min-height: 50px;
+        font-family: monospace;
+      }
+      
+      .file-controls {
+        margin-bottom: 15px;
+        padding: 10px;
+      }
+    </style>
   </head>
   <body class="dark:bg-gray-900 dark:text-white">
     <div class="file-controls">
@@ -14,7 +30,7 @@
       <span id="file-info"></span>
     </div>
     <perspective-viewer id="perspective-viewer"></perspective-viewer>
-    <div id="output">Welcome to the Parquet Viewer! Please load a file to get started.</div>
+    <div id="output" class="p-4 text-lg border-t border-gray-700 mt-4">Welcome to the Parquet Viewer! Please load a file to get started.</div>
 
     <!-- Import scripts directly in the HTML -->
     <script type="module">
@@ -25,12 +41,23 @@
       import "https://cdn.jsdelivr.net/npm/@finos/perspective-viewer-d3fc/dist/cdn/perspective-viewer-d3fc.js";
 
       console.log('Renderer script loaded');
+      
+      // Get elements directly instead of waiting for DOM content loaded
       const output = document.getElementById('output');
       const fileInfo = document.getElementById('file-info');
-
-      // Initialize perspective worker once DOM is loaded
-      document.addEventListener('DOMContentLoaded', async () => {
+      
+      console.log('Output element found:', output);
+      
+      // Initialize immediately, don't wait for DOMContentLoaded
+      async function initializeApp() {
+        if (!output) {
+          console.error('Output element not found');
+          return;
+        }
+        
         try {
+          output.textContent = 'Initializing...';
+          
           // Create the worker
           const worker = perspective.worker();
           console.log('Perspective worker created');
@@ -85,6 +112,9 @@
                   break;
               }
               
+              // Add debug statements
+              console.log('File loaded, creating table...');
+              
               // Load table into viewer
               await viewer.load(table);
               
@@ -100,11 +130,23 @@
           });
           
           output.textContent = 'Ready to load files. Supported formats: Parquet, CSV, Arrow, JSON';
+          
+          // Test the output functionality every few seconds
+          let testCount = 0;
+          setInterval(() => {
+            testCount++;
+            output.textContent = `Output test ${testCount}: ${new Date().toLocaleTimeString()}`;
+            console.log(`Updated output element (${testCount})`);
+          }, 5000);
+          
         } catch (error) {
           console.error('Error initializing perspective:', error);
           output.textContent = `Error initializing perspective: ${error.message}`;
         }
-      });
+      }
+      
+      // Call initialization function
+      initializeApp();
 
       // Add a utility function to format file sizes
       function formatFileSize(bytes) {

@@ -4,7 +4,13 @@
 
 @layer components {
   body {
-    @apply m-0 p-5 flex flex-col h-screen box-border overflow-hidden;
+    @apply m-0 p-5 flex flex-col h-screen box-border overflow-hidden bg-gray-900 text-gray-100;
+    background-color: #121212;
+    color: #e0e0e0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
   }
 
   .file-controls {
@@ -17,12 +23,16 @@
 
   perspective-viewer {
     @apply flex-1 min-h-[500px] mb-2.5;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 10;
   }
 
   #output {
-    @apply p-2.5 rounded font-mono text-gray-600 dark:text-gray-300 
-           bg-gray-100 dark:bg-gray-800 border border-gray-300 
-           dark:border-gray-700 border-t mt-2.5 h-auto;
+    @apply p-2.5 rounded font-mono text-gray-300 bg-gray-800 border border-gray-700 border-t mt-2.5 h-auto;
   }
 
   .dark #output {
@@ -39,5 +49,65 @@
 
   #loadButton {
     @apply ml-2.5 p-1.5;
+  }
+
+  #drop-area {
+    @apply border-5 border-dashed border-gray-300 rounded-2xl w-[480px] font-sans my-[100px] mx-auto p-12 text-gray-600 bg-gray-800;
+    border: 2px dashed #444;
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    z-index: 20;
+  }
+
+  #drop-area.highlight {
+    @apply border-cornflowerblue text-black;
+    border-color: #0077cc;
+  }
+
+  .status {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background-color: rgba(0,0,0,0.7);
+    color: #fff;
+    border-radius: 5px;
+    z-index: 100;
+    font-family: monospace;
+  }
+
+  .status.error {
+    background-color: rgba(200,0,0,0.7);
+  }
+
+  p {
+    @apply mt-0;
+  }
+
+  .my-form {
+    @apply mb-2.5;
+  }
+
+  #gallery {
+    @apply mt-2.5;
+  }
+
+  #gallery img {
+    @apply w-[150px] mb-2.5 mr-2.5 align-middle;
+  }
+
+  .button {
+    @apply inline-block p-2.5 bg-gray-700 cursor-pointer rounded-md text-gray-100;
+    background-color: #333;
+    color: #e0e0e0;
+  }
+
+  .button:hover {
+    @apply bg-cornflowerblue text-white;
+    background-color: #0077cc;
+  }
+
+  #fileElem {
+    @apply hidden;
   }
 }

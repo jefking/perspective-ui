@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="dark">
 
 <head>
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no" />
@@ -12,75 +12,18 @@
     href="https://cdn.jsdelivr.net/npm/@finos/perspective-viewer/dist/css/themes.css" />
 
 </head>
-<style>
-  #drop-area {
-  border: 5px dashed #ccc;
-  border-radius: 15px;
-  width: 480px;
-  font-family: sans-serif;
-  margin: 100px auto;
-  padding: 48px;
-  color: #666;
-}
-
-#drop-area.highlight {
-  border-color: cornflowerblue;
-  color: #000;
-}
-
-p {
-  margin-top: 0;
-}
-
-.my-form {
-  margin-bottom: 10px;
-}
-
-#gallery {
-  margin-top: 10px;
-}
-
-#gallery img {
-  width: 150px;
-  margin-bottom: 10px;
-  margin-right: 10px;
-  vertical-align: middle;
-}
-
-.button {
-  display: inline-block;
-  padding: 10px;
-  background: #ccc;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.button:hover {
-  background: cornflowerblue;
-  color: white;
-}
-
-#fileElem {
-  display: none;
-}
-
-perspective-viewer {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-</style>
 <body>
   <div id="drop-area">
     <form class="my-form">
       <p>Upload a CSV/Arrow file by dragging from your desktop and dropping onto the dashed region.</p>
       <p>(Data is processed in browser, and never sent to any server).</p>
-      <input type="file" id="fileElem" multiple accept=".feather,.arrow,.csv" />
+      <input type="file" id="fileElem" multiple accept=".feather,.arrow,.csv,.parquet" />
       <label class="button" for="fileElem">Select a file</label>
     </form>
   </div>
+  
+  <!-- Add a status div to show loading and error states -->
+  <div id="status" class="status"></div>
 
   <!-- Import scripts directly in the HTML -->
   <script type="module">
@@ -91,7 +34,31 @@ perspective-viewer {
 
     import perspective from "https://cdn.jsdelivr.net/npm/@finos/perspective@3.3.3/dist/cdn/perspective.js";
 
-    const worker = await perspective.worker();
+    // Create a status element for showing messages
+    let statusElement;
+    
+    // Update status with message and optional class
+    function updateStatus(message, className = '') {
+      if (!statusElement) {
+        statusElement = document.getElementById('status');
+      }
+      
+      if (statusElement) {
+        statusElement.textContent = message;
+        statusElement.className = 'status ' + className;
+      }
+      console.log('Status:', message);
+    }
+
+    // Initialize the worker
+    let worker;
+    try {
+      worker = await perspective.worker();
+      updateStatus('Perspective initialized');
+    } catch (error) {
+      updateStatus('Failed to initialize Perspective: ' + error.message, 'error');
+      console.error('Worker initialization error:', error);
+    }
 
     // Get `dropArea` element from the DOM.
     var dropArea = document.getElementById("drop-area");
@@ -158,28 +125,74 @@ perspective-viewer {
 
     // On file load, remove the `dropArea` and replace it with a `<perspective-viewer>`.
     function uploadFile(file) {
+      updateStatus(`Loading ${file.name}...`);
       let reader = new FileReader();
-      reader.onload = function (fileLoadedEvent) {
-        let data = fileLoadedEvent.target.result;
+      
+      reader.onload = async function (fileLoadedEvent) {
+        try {
+          let data = fileLoadedEvent.target.result;
+          updateStatus(`Processing ${file.name}...`);
 
-        // Remove the `dropArea` from the DOM.
-        const parent = dropArea.parentElement;
-        parent.removeChild(dropArea);
+          // Remove the `dropArea` from the DOM.
+          const parent = dropArea.parentElement;
+          parent.removeChild(dropArea);
 
-        // Create a `<perspective-viewer>` and append it to the DOM.
-        const psp = document.createElement("perspective-viewer");
-        parent.appendChild(psp);
+          // Create a `<perspective-viewer>` with explicit styling
+          const psp = document.createElement("perspective-viewer");
+          psp.style.position = "absolute";
+          psp.style.top = "0";
+          psp.style.left = "0";
+          psp.style.right = "0";
+          psp.style.bottom = "0";
+          psp.style.width = "100%";
+          psp.style.height = "100%";
+          psp.style.backgroundColor = "#1a1a1a";
+          parent.appendChild(psp);
+          
+          // Set dark theme
+          psp.setAttribute('theme', 'Pro Dark');
 
-        // Load the file data into `<perspective-viewer>`.
-        if (file.name.endsWith(".feather") || file.name.endsWith(".arrow")) {
-          psp.load(worker.table(data));
-        } else {
-          psp.load(worker.table(data, { format: "csv" }));
+          // Load the file data into `<perspective-viewer>`.
+          let table;
+          if (file.name.endsWith(".feather") || file.name.endsWith(".arrow")) {
+            updateStatus(`Creating table from Arrow format...`);
+            table = await worker.table(data);
+          } else if (file.name.endsWith(".parquet")) {
+            updateStatus(`Creating table from Parquet format...`);
+            table = await worker.table(data);
+          } else {
+            updateStatus(`Creating table from CSV format...`);
+            table = await worker.table(data, { format: "csv" });
+          }
+          
+          updateStatus(`Loading data into viewer...`);
+          await psp.load(table);
+          
+          // const rowCount = await table.num_rows();
+          // const columnCount = await table.num_columns();
+          updateStatus(`Loaded ${file.name}.`);
+          
+          // Force a resize to ensure proper display
+          window.dispatchEvent(new Event('resize'));
+          
+        } catch (error) {
+          console.error("Error loading file:", error);
+          updateStatus(`Error loading ${file.name}: ${error.message}`, 'error');
         }
       };
 
+      reader.onerror = function(event) {
+        console.error("FileReader error:", event);
+        updateStatus(`Error reading ${file.name}: ${event.target.error}`, 'error');
+      };
+
       // Read the contents of the file - triggering the onload when finished.
-      reader.readAsArrayBuffer(file);
+      try {
+        reader.readAsArrayBuffer(file);
+      } catch (error) {
+        console.error("Error starting file read:", error);
+        updateStatus(`Error reading ${file.name}: ${error.message}`, 'error');
+      }
     }
   </script>
 </body>
